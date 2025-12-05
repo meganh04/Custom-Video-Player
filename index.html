@@ -22,13 +22,34 @@
     <script src="script.js" defer></script>
   </head>
   <body>
-     <h1>Custom Video Player</h1>
-     <video
-       controls
-       src="videos/gone.mp4"
-       id="video"
-       class="screen"
-       poster="img/poster.png"
-     ></video>
+    <h1>Custom Video Player</h1>
+    <video
+      controls
+      src="videos/gone.mp4"
+      id="video"
+      class="screen"
+      poster="img/poster.png"
+    ></video>
+
+    <div class="controls">
+      <!-- Create a play button with an icon with a class of i.fa.fa-play.fa-2x -->
+      <button class="btn" id="play"><i class="fa fa-play fa-2x"></i></button>
+      <!-- Create a stop button with an icon with a class of i.fa.fa-play.fa-2x -->
+      <button class="btn" id="stop"><i class="fa fa-stop fa-2x"></i></button>
+      <!-- Create an input for the progress bar -->
+      <input
+        type="range"
+        name="progress"
+        id="progress"
+        class="progress"
+        min="0"
+        max="100"
+        step="0.1"
+        value="0"
+      />
+      <!-- Comment out the progress.css to see the default style of the progress bar -->
+      <!-- Create a span for the timestamp -->
+      <span class="timestamp" id="timestamp">00:00</span>
+    </div>
   </body>
 </html>
