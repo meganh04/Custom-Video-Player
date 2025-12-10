@@ -5,19 +5,26 @@ const stop = document.getElementById("stop");
 const progress = document.getElementById("progress");
 const timestamp = document.getElementById("timestamp");
 
-// Event Listeners
-video.addEventListener("click", toggleVideoStatus);
-video.addEventListener("pause", updatePlayIcon);
-video.addEventListener("play", updatePlayIcon);
-video.addEventListener("timeupdate", updateProgress);
+// Safe addEventListener helper
+function safeAdd(el, ev, fn) {
+  if (el) el.addEventListener(ev, fn);
+}
 
-play.addEventListener("click", toggleVideoStatus);
-stop.addEventListener("click", stopVideo);
-progress.addEventListener("change", setVideoProgress);
+// Event Listeners (only attach when elements exist)
+safeAdd(video, "click", toggleVideoStatus);
+safeAdd(video, "pause", updatePlayIcon);
+safeAdd(video, "play", updatePlayIcon);
+safeAdd(video, "timeupdate", updateProgress);
+safeAdd(video, "loadedmetadata", updateProgress);
+
+safeAdd(play, "click", toggleVideoStatus);
+safeAdd(stop, "click", stopVideo);
+safeAdd(progress, "change", setVideoProgress);
+safeAdd(progress, "input", setVideoProgress);
 
 // Handlers
-// Play and Pause Video
 function toggleVideoStatus() {
+  if (!video) return;
   if (video.paused) {
     video.play();
   } else {
@@ -25,8 +32,8 @@ function toggleVideoStatus() {
   }
 }
 
-// Update the Play/Pause Icon
 function updatePlayIcon() {
+  if (!play || !video) return;
   if (video.paused) {
     play.innerHTML = '<i class="fa fa-play fa-2x"></i>';
   } else {
@@ -34,50 +41,31 @@ function updatePlayIcon() {
   }
 }
 
-// Stop the Video
 function stopVideo() {
-  // Note: There is not a video.stop(), so let's manually code that logic
+  if (!video) return;
   video.currentTime = 0;
   video.pause();
 }
 
-// Update the Progress and Timestamp
 function updateProgress() {
-  console.log("time:", video.currentTime);
-  console.log("duration:", video.duration);
+  if (!video || !progress || !timestamp) return;
+
+  if (!isFinite(video.duration) || video.duration === 0) {
+    progress.value = 0;
+    timestamp.innerHTML = '00:00';
+    return;
+  }
+
   const percentage = (video.currentTime / video.duration) * 100;
-  console.log("percentage:", percentage);
+  progress.value = Math.min(100, Math.max(0, percentage));
 
-  progress.value = percentage;
+  const minutes = Math.floor(video.currentTime / 60);
+  const seconds = Math.floor(video.currentTime % 60);
+  timestamp.innerHTML = `${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
 }
 
-// Compute the minutes
-let minutes = Math.floor(video.currentTime / 60);
-
-// Prefix with a zero (0) if the minutes are single digit values
-if (minutes < 10) {
-  minutes = "0" + String(minutes);
-}
-
-// Compute the seconds
-let seconds = Math.floor(video.currentTime % 60);
-
-// Prefix with a zero (0) if the seconds are single digit values
-if (seconds < 10) {
-  seconds = "0" + String(seconds);
-}
-
-timestamp.innerHTML = `${minutes}:${seconds}`;
-
-// Set Video Timestamp to Progress
 function setVideoProgress() {
-  // Compute the location of the video based on the progress value
+  if (!video || !progress) return;
   const location = (Number(progress.value) * video.duration) / 100;
-
-  // Sync the video's current time to the progress bar's value
-  video.currentTime = location;
-
-  // The line above triggers a `timeupdate` event which will invoke the `updateProgress` function
+  if (isFinite(location)) video.currentTime = location;
 }
-
-progress.addEventListener("input", setVideoProgress);

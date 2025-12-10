@@ -22,13 +22,16 @@
     <script src="script.js" defer></script>
   </head>
   <body>
-    <h1>Custom Video Player</h1>
+    <h1>Firenze, Italia</h1>
+    <!-- Note: For smooth web playback prefer a web-optimized MP4 (H.264) or adaptive streams (HLS/DASH). -->
     <video
-      controls
-      src="videos/gone.mp4"
       id="video"
       class="screen"
-      poster="img/poster.png"
+      controls
+      preload="metadata"
+      playsinline
+      src="videos/florence.MOV"
+      poster="img/florencePoster.jpeg"
     ></video>
 
     <div class="controls">
